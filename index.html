@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f8">
+  <meta name="description" content="Carte de visite numérique professionnelle.">
+  <title>Ma carte de visite</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172b3a;
+      --muted: #71808c;
+      --accent: #117c76;
+      --accent-dark: #0c625d;
+      --surface: #fff;
+      --canvas: #f2f5f6;
+      --line: #e8edef;
+      --shadow: 0 24px 70px rgb(25 49 62 / 12%);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 32px 18px;
+      background:
+        radial-gradient(ellipse at 12% 15%, rgb(17 124 118 / 10%), transparent 32rem),
+        var(--canvas);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background-color 180ms ease, color 180ms ease;
+    }
+
+    button, a { font: inherit; }
+    button { cursor: pointer; }
+
+    .page { width: min(100%, 470px); }
+
+    .eyebrow {
+      margin: 0 0 15px 4px;
+      color: var(--muted);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid rgb(255 255 255 / 75%);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .cover {
+      position: relative;
+      height: 142px;
+      background:
+        radial-gradient(circle at 82% 18%, rgb(255 255 255 / 19%) 0 2px, transparent 3px),
+        radial-gradient(circle at 82% 18%, transparent 0 47px, rgb(255 255 255 / 12%) 48px 49px, transparent 50px),
+        linear-gradient(120deg, #153d50, #117c76);
+    }
+
+    .cover::after {
+      position: absolute;
+      right: -52px;
+      bottom: -96px;
+      width: 250px;
+      height: 180px;
+      border: 1px solid rgb(255 255 255 / 15%);
+      border-radius: 50%;
+      content: "";
+      transform: rotate(-24deg);
+    }
+
+    .theme-toggle {
+      position: absolute;
+      z-index: 1;
+      top: 17px;
+      right: 17px;
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid rgb(255 255 255 / 25%);
+      border-radius: 50%;
+      background: rgb(255 255 255 / 12%);
+      color: #fff;
+    }
+
+    .theme-toggle:hover { background: rgb(255 255 255 / 23%); }
+    .theme-toggle svg { width: 18px; height: 18px; }
+
+    .content { padding: 0 32px 30px; }
+
+    .profile-row {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      margin-top: -52px;
+    }
+
+    .avatar-wrap { position: relative; }
+
+    .avatar {
+      display: grid;
+      width: 108px;
+      height: 108px;
+      place-items: center;
+      overflow: hidden;
+      border: 5px solid var(--surface);
+      border-radius: 50%;
+      background: #dcece9;
+      color: var(--accent-dark);
+      font-size: 1.8rem;
+      font-weight: 750;
+      letter-spacing: .04em;
+    }
+
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar img[hidden] { display: none; }
+
+    .availability {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 12px;
+      padding: 7px 10px;
+      border-radius: 99px;
+      background: #edf7f4;
+      color: #26705f;
+      font-size: .72rem;
+      font-weight: 650;
+    }
+
+    .availability::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #46aa7b;
+      content: "";
+    }
+
+    h1 {
+      margin: 21px 0 5px;
+      font-size: clamp(1.7rem, 7vw, 2.15rem);
+      letter-spacing: -.045em;
+      line-height: 1.15;
+    }
+
+    .role {
+      margin: 0;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 650;
+    }
+
+    .intro {
+      margin: 17px 0 22px;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.7;
+    }
+
+    .details {
+      display: grid;
+      gap: 13px;
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      color: var(--ink);
+      font-size: .9rem;
+      text-decoration: none;
+    }
+
+    .detail-icon {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 11px;
+      background: #f1f7f6;
+      color: var(--accent);
+    }
+
+    .detail-icon svg { width: 17px; height: 17px; }
+    .detail-value { overflow-wrap: anywhere; }
+    .detail a { color: inherit; text-decoration: none; }
+    .detail a:hover { color: var(--accent); }
+
+    [contenteditable="true"] {
+      border-radius: 3px;
+      outline: none;
+    }
+
+    [contenteditable="true"]:focus {
+      box-shadow: 0 2px 0 rgb(17 124 118 / 40%);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .action {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-size: .87rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 150ms ease, transform 150ms ease;
+    }
+
+    .action:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .action.secondary { background: transparent; color: var(--accent-dark); }
+    .action.secondary:hover { background: #eff7f5; }
+    .action svg { width: 17px; height: 17px; }
+
+    .hint {
+      margin: 15px 0 0;
+      color: var(--muted);
+      font-size: .75rem;
+      text-align: center;
+    }
+
+    .status {
+      min-height: 20px;
+      margin: 9px 0 0;
+      color: var(--accent-dark);
+      font-size: .8rem;
+      text-align: center;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --ink: #eaf1f3;
+      --muted: #a4b2b9;
+      --surface: #1c2b33;
+      --canvas: #101a20;
+      --line: #33434b;
+      --shadow: 0 24px 70px rgb(0 0 0 / 30%);
+    }
+
+    body.dark .availability, body.dark .detail-icon { background: #253e3b; }
+    body.dark .action.secondary { color: #8ed4c7; }
+    body.dark .action.secondary:hover { background: #253e3b; }
+    body.dark .avatar { border-color: var(--surface); background: #294540; color: #a0ded3; }
+
+    @media (max-width: 420px) {
+      body { padding: 20px 12px; }
+      .content { padding-right: 22px; padding-left: 22px; }
+      .cover { height: 124px; }
+      .avatar { width: 96px; height: 96px; }
+      .profile-row { margin-top: -47px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <p class="eyebrow">Carte de visite numérique</p>
+    <article class="card" aria-label="Carte de visite">
+      <div class="cover">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activer le thème sombre" title="Changer de thème">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M20.2 15.4A8.3 8.3 0 0 1 8.6 3.8 8.4 8.4 0 1 0 20.2 15.4Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="content">
+        <div class="profile-row">
+          <div class="avatar-wrap">
+            <div class="avatar" id="avatar" aria-label="Photo de profil">
+              <span id="initials">VN</span>
+              <img id="profile-image" src="C:/Pricemou/photoDjibril.jpg" alt="Photo de profil">
+            </div>
+          </div>
+          <span class="availability">Disponible pour échanger</span>
+        </div>
+
+        <h1 id="name" contenteditable="true" spellcheck="false" aria-label="Votre nom">Votre Pricemou</h1>
+        <p class="role" id="role" contenteditable="true" spellcheck="false" aria-label="Votre profession">Developpeur fullstack & mobile junior </p>
+        <p class="intro" id="intro" contenteditable="true" spellcheck="true" aria-label="Votre présentation">
+           Développeur Fullstack & Mobile Junior, passionné par la création d'applications performantes de bout en bout. J'allie le développement (Web & Mobile) aux pratiques DevOps pour automatiser les déploiements, optimiser le code et garantir une mise en production fluide, sécurisée et continue de vos projets.
+           • Dev : React, Node.js, Flutter / React Native
+           • DevOps : Docker, CI/CD (GitHub Actions / GitLab CI), Semgrep, Sunaqurbe, terraform Cloud (AWS / Vercel)
+        </p>
+
+        <section class="details" aria-label="Coordonnées">
+          <div class="detail">
+            <span class="detail-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+            </span>
+            <span class="detail-value" id="email" contenteditable="true" spellcheck="false" aria-label="Votre adresse e-mail">cecedjibrilpricemou1er@gmail.com</span>
+          </div>
+          <div class="detail">
+            <span class="detail-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 3h3l2 5-2.2 1.6a15 15 0 0 0 4.6 4.6L16 12l5 2v3c0 1.1-.9 2-2 2C10.7 19 5 13.3 5 5c0-1.1.9-2 2-2Z"/></svg>
+            </span>
+            <span class="detail-value" id="phone" contenteditable="true" spellcheck="false" aria-label="Votre numéro de téléphone">+224 627 08 26 01</span>
+          </div>
+          <div class="detail">
+            <span class="detail-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            </span>
+            <span class="detail-value" id="location" contenteditable="true" spellcheck="false" aria-label="Votre ville">Conakry, Guinee</span>
+          </div>
+        </section>
+
+        <div class="actions">
+          <a class="action" id="email-link" href="mailto:cecedjibrilpricemou1er@gmail.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
+            Me contacter
+          </a>
+          <button class="action secondary" id="save-contact" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2M19 8v6m-3-3h6"/></svg>
+            Enregistrer le contact
+          </button>
+        </div>
+        <p class="hint">Cliquez sur les textes pour les personnaliser.</p>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+    </article>
+  </main>
+
+  <script>
+    const nameField = document.querySelector("#name");
+    const emailField = document.querySelector("#email");
+    const phoneField = document.querySelector("#phone");
+    const locationField = document.querySelector("#location");
+    const initials = document.querySelector("#initials");
+    const emailLink = document.querySelector("#email-link");
+    const status = document.querySelector("#status");
+
+    function cleanText(element) {
+      return element.innerText.trim().replace(/\s+/g, " ");
+    }
+
+    function updateContact() {
+      const name = cleanText(nameField);
+      const words = name.split(" ").filter(Boolean);
+      initials.textContent = words.length
+        ? words.slice(0, 2).map((word) => word[0]).join("").toUpperCase()
+        : "VN";
+      nameField.setAttribute("aria-label", name || "Votre nom");
+      const email = cleanText(emailField);
+      emailLink.href = `mailto:${encodeURIComponent(email).replace(/%40/gi, "@")}`;
+    }
+
+    document.querySelectorAll("[contenteditable='true']").forEach((field) => {
+      field.addEventListener("input", updateContact);
+    });
+
+    const profileImage = document.querySelector("#profile-image");
+    profileImage.addEventListener("load", () => {
+      initials.hidden = true;
+    });
+    profileImage.addEventListener("error", () => {
+      profileImage.hidden = true;
+    });
+
+    document.querySelector("#theme-toggle").addEventListener("click", (event) => {
+      const isDark = document.body.classList.toggle("dark");
+      event.currentTarget.setAttribute("aria-label", isDark ? "Activer le thème clair" : "Activer le thème sombre");
+    });
+
+    document.querySelector("#save-contact").addEventListener("click", () => {
+      const name = cleanText(nameField);
+      const email = cleanText(emailField);
+      const phone = cleanText(phoneField);
+      const location = cleanText(locationField);
+      const escapeVCard = (value) => value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+      const content = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        `FN:${escapeVCard(name)}`,
+        `EMAIL:${escapeVCard(email)}`,
+        `TEL;TYPE=CELL:${escapeVCard(phone)}`,
+        `ADR;TYPE=WORK:;;${escapeVCard(location)}`,
+        "END:VCARD"
+      ].join("\r\n");
+      const file = new Blob([content], { type: "text/vcard;charset=utf-8" });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${name || "contact"}.vcf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      status.textContent = "Votre fiche contact a été téléchargée.";
+    });
+
+    updateContact();
+  </script>
+</body>
+</html>
