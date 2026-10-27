@@ -201,15 +201,6 @@
     .detail a { color: inherit; text-decoration: none; }
     .detail a:hover { color: var(--accent); }
 
-    [contenteditable="true"] {
-      border-radius: 3px;
-      outline: none;
-    }
-
-    [contenteditable="true"]:focus {
-      box-shadow: 0 2px 0 rgb(17 124 118 / 40%);
-    }
-
     .actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -304,9 +295,9 @@
           <span class="availability">Disponible pour échanger</span>
         </div>
 
-        <h1 id="name" contenteditable="true" spellcheck="false" aria-label="Votre nom">Votre Pricemou</h1>
-        <p class="role" id="role" contenteditable="true" spellcheck="false" aria-label="Votre profession">Développeur full-stack et mobile junior</p>
-        <div class="intro" id="intro" contenteditable="true" spellcheck="true" aria-label="Votre présentation">
+        <h1 id="name">Votre Pricemou</h1>
+        <p class="role" id="role">Développeur full-stack et mobile junior</p>
+        <div class="intro" id="intro">
           <p>Passionné par la création d'applications performantes de bout en bout, je combine le développement web et mobile avec les pratiques DevOps. J'automatise les déploiements, optimise le code et contribue à des mises en production fluides, sécurisées et continues.</p>
           <ul>
             <li><strong>Développement :</strong> Angular, Node.js, Laravel et Flutter</li>
@@ -319,19 +310,19 @@
             <span class="detail-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
             </span>
-            <span class="detail-value" id="email" contenteditable="true" spellcheck="false" aria-label="Votre adresse e-mail">cecedjibrilpricemou1er@gmail.com</span>
+            <span class="detail-value" id="email">cecedjibrilpricemou1er@gmail.com</span>
           </div>
           <div class="detail">
             <span class="detail-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 3h3l2 5-2.2 1.6a15 15 0 0 0 4.6 4.6L16 12l5 2v3c0 1.1-.9 2-2 2C10.7 19 5 13.3 5 5c0-1.1.9-2 2-2Z"/></svg>
             </span>
-            <span class="detail-value" id="phone" contenteditable="true" spellcheck="false" aria-label="Votre numéro de téléphone">+224 627 08 26 01</span>
+            <span class="detail-value" id="phone">+224 627 08 26 01</span>
           </div>
           <div class="detail">
             <span class="detail-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
             </span>
-            <span class="detail-value" id="location" contenteditable="true" spellcheck="false" aria-label="Votre ville">Conakry kipé, Guinee</span>
+            <span class="detail-value" id="location">Conakry kipé, Guinee</span>
           </div>
         </section>
 
@@ -372,10 +363,6 @@
       const email = cleanText(emailField);
       emailLink.href = `mailto:${encodeURIComponent(email).replace(/%40/gi, "@")}`;
     }
-
-    document.querySelectorAll("[contenteditable='true']").forEach((field) => {
-      field.addEventListener("input", updateContact);
-    });
 
     const profileImage = document.querySelector("#profile-image");
     profileImage.addEventListener("load", () => {
